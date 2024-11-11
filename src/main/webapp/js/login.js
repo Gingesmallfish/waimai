@@ -104,7 +104,7 @@ function doLogin() {
 		return;
 	}
 	$("#loginForm").ajaxSubmit({
-		url : "login",
+		url : "user/login",
 		type : "post",
 		dataType : "json",
 		beforeSubmit : function(arr, $form, options) {},
@@ -113,11 +113,14 @@ function doLogin() {
 				result = JSON.parse(result);
 			}
 			$.messager.alert('登录提示', result.message, 'info', function(r) {
-				if (result.status) {
+				if (result.code == 0) {
 					window.location.href = "../main.jsp";
 				} else {
+					// 验证码刷新
 					$('#verify-img').attr('src', verify + '?time=' + Math.random());
+					// 清空我们验证码文本框
 					$('input[textboxname=verify]').textbox('setValue', '');
+					// 验证码文本框聚焦
 					$('input[textboxname=verify]').textbox().next('span').find('input').focus();
 				}
 			});

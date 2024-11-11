@@ -13,16 +13,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@WebFilter(
-        urlPatterns = {"/*"},
-        initParams = {@WebInitParam(
-                name = "excludeUrl",
-                value = "/user/login,/error.jsp,/login.jsp,/user/verify"
-        ), @WebInitParam(
-                name = "excludeSuffix",
-                value = ".css,.js,.jpg,.png,.gif,.ico,.html,.htm,.txt,.xml,.json,.md,.svg,.woff,.woff2,.ttf,.eot,.otf"
-        )}
-)
+//@WebFilter(
+//        urlPatterns = {"/*"},
+//        initParams = {@WebInitParam(
+//                name = "excludeUrl",
+//                value = "/user/login,/error.jsp,/login.jsp,/user/verify"
+//        ), @WebInitParam(
+//                name = "excludeSuffix",
+//                value = ".css,.js,.jpg,.png,.gif,.ico,.html,.htm,.txt,.xml,.json,.md,.svg,.woff,.woff2,.ttf,.eot,.otf"
+//        )}
+//)
 public class WmFilter implements Filter {
     private String[] excludeUrls;
     private String[] excludeSuffix;

@@ -1,5 +1,11 @@
 package com.cqeec.waimai.controller;
 
+import com.cqeec.waimai.bean.Employee;
+import com.cqeec.waimai.exception.CastResultException;
+import com.cqeec.waimai.service.EmployeeService;
+import com.cqeec.waimai.service.impl.EmployeeServiceImpl;
+import com.cqeec.waimai.util.Result;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.GifCaptcha;
 import com.wf.captcha.SpecCaptcha;
@@ -12,6 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
 
 /**
  *
@@ -22,6 +30,7 @@ import java.io.IOException;
         loadOnStartup = 1)
 public class UserController extends BaseController{
     String captchaType;
+    EmployeeService employeeService;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -70,7 +79,35 @@ public class UserController extends BaseController{
     }
 
     private void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        // 获取用户登录的信息
+        String username = req.getParameter("username") == null ? "" : req.getParameter("username");
+        String password = req.getParameter("password") == null ? "" : req.getParameter("password");
+        String verify = req.getParameter("verify") == null ? "" : req.getParameter("verify");
+        // 验证登录信息是否完整
+        ObjectMapper objectMapper = new ObjectMapper();
+        PrintWriter out = resp.getWriter();
+        if (username.equals("") || password.equals("") || verify.equals("")) {
+            out.print(objectMapper.writeValueAsString(new Result(Result.FAIL,"登录信息为填写完整")));
+        } else {
+            // 先判断验证码是否正确
+            if (req.getSession().getAttribute("verifyCode").toString().equalsIgnoreCase(verify)) {
+                // 验证码用户名于密码是否正确
+                try {
+                    Result result = employeeService.login(username, password);
+                    if (result.code == Result.SUCCESS) {
+                        // 将用户数据存在session中 以此记录用户中登录状态
+                        req.getSession().setAttribute("user",(Employee)result.data);
+                    }
+                    out.print(objectMapper.writeValueAsString(result));
+                } catch (SQLException e) {
+                   handleException(req,resp,e);
+                } catch (CastResultException e) {
+                    handleException(req,resp,e);
+                }
+            } else {
+                out.print(objectMapper.writeValueAsString(new Result(Result.FAIL,"验证码错误")));
+            }
+        }
     }
 
     private void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -84,5 +121,6 @@ public class UserController extends BaseController{
     @Override
     public void init(ServletConfig config) throws ServletException {
         captchaType = config.getInitParameter("captchaType");
+        employeeService = new EmployeeServiceImpl();
     }
 }
