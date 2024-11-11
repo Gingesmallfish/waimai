@@ -24,6 +24,14 @@ public interface EmployeeService {
 
     boolean enable(long id) throws SQLException, CastResultException;
 
+    /**
+     *  业务登录逻辑
+     * @param username 用户名
+     * @param password 密码
+     * @return
+     * @throws SQLException
+     * @throws CastResultException
+     */
     Result login(String username, String password) throws SQLException, CastResultException;
 
     ArrayList<Employee> list(Map<String, Object> params, int currentPage, int recordsPerPage) throws SQLException, CastResultException;

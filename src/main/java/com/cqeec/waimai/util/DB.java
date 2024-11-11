@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *
+ *  数据工具类
  **/
 public class DB {
     private static Connection connection = null;
@@ -20,12 +20,15 @@ public class DB {
     public DB() {
     }
 
+    // 开启事务
     public static void  startTransaction() throws SQLException {
         connection.setAutoCommit(false);
     }
+    // 提交事务
     public static void commitTransaction() throws SQLException {
         connection.commit();
     }
+    // 事务回滚
     public static void rollbackTransaction() throws SQLException {
         connection.rollback();
     }
@@ -36,7 +39,7 @@ public class DB {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");//加载驱动
             connection = DriverManager.getConnection(
-                    "jdbc:mysql:///reggie?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8",
+                    "jdbc:mysql:///reggie?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8", // 这个东八区，的时间，也表示北京时间
                     "root",
                     "123456"
             );
@@ -45,7 +48,7 @@ public class DB {
         }
         return connection;
     }
-
+    /* 执行查询 */
     public static ResultSet query(Connection connection, String sql) throws SQLException {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(sql);
@@ -76,10 +79,12 @@ public class DB {
         return resultSet;
     }
 
+    /* 执行增加，删除，修改 */
     public static boolean execute(Connection connection, String sql) throws SQLException {
         Statement statement = null;
         statement = connection.createStatement();
-        return statement.execute(sql);
+        statement.executeUpdate(sql);
+        return true;
     }
 
     public static boolean execute(Connection connection, String sql, Object... params) throws SQLException {
@@ -104,6 +109,7 @@ public class DB {
         return true;
     }
 
+    /* 将查询结果集转换成ArrayList对象 */
     public static <T> ArrayList<T> resultToList(ResultSet resultSet, Class<T> clazz) throws CastResultException {
         ResultSetMetaData metaData = null;
         ArrayList<T> list = new ArrayList();
