@@ -125,7 +125,7 @@ function doLogout() {
 	$.messager.confirm('系统提示', '确认是否注销当前用户?', function(r) {
 		if (r) {
 			$.ajax({
-				url: logOut,
+				url: "user_/logout",
 				type: 'post',
 				datatype: 'json',
 				async: false,
@@ -134,8 +134,8 @@ function doLogout() {
 						result = JSON.parse(result);
 					}
 					$.messager.alert('系统提示', result.message, 'info', function(r) {
-						if (result.status) {
-							window.location.href = "login.jsp";
+						if (result.code == 0) {
+							window.location.href = "../login.jsp";
 						}
 					});
 				}

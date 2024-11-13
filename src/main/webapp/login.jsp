@@ -27,7 +27,7 @@ table {
 	margin-top: 20px;
 }
 tr {
-	height: 60px;
+	height: 50px;
 	text-align: left;
 }
 
@@ -39,7 +39,7 @@ tr td {
 </head>
 <body>
 	<div id="panel_login"
-		style="margin: auto;width: 600px;margin-top: 100px;">
+		style="margin: auto;width: 600px;margin-top: 270px;">
 		<!--创建登录面板-->
 		<div id="login">
 			<form id="loginForm">
@@ -61,6 +61,15 @@ tr td {
 							style="padding:0px 0px 0px 10px;vertical-align: middle;">
 								<img style="cursor:pointer;" id='verify-img' />
 						</span></td>
+					</tr>
+					<tr style="text-align: left;">
+						<td colspan="2">
+							<input type="checkbox" class="easyui-checkbox"
+								   id="rememberMe" name="rememberMe"
+								   style="width:18px;height:18px;"
+							/>
+							<label for="rememberMe">记住我(3天内自动登录)</label>
+						</td>
 					</tr>
 					<tr style="text-align: center;">
 						<td colspan="2"><a id="loginBtn" href="javascript:void(0)"

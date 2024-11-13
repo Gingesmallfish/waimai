@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(value = "/dish/*")
+@WebServlet(value = "/dish_/*")
 public class DishController extends BaseController {
 
     @Override

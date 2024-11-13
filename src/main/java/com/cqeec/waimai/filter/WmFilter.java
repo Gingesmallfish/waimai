@@ -13,16 +13,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-//@WebFilter(
-//        urlPatterns = {"/*"},
-//        initParams = {@WebInitParam(
-//                name = "excludeUrl",
-//                value = "/user/login,/error.jsp,/login.jsp,/user/verify"
-//        ), @WebInitParam(
-//                name = "excludeSuffix",
-//                value = ".css,.js,.jpg,.png,.gif,.ico,.html,.htm,.txt,.xml,.json,.md,.svg,.woff,.woff2,.ttf,.eot,.otf"
-//        )}
-//)
+@WebFilter(
+        urlPatterns = {"/*"},
+        initParams = {@WebInitParam(
+                name = "excludeUrl",
+                value = "/user_/login,/error.jsp,/login.jsp,/user_/verify"
+        ), @WebInitParam(
+                name = "excludeSuffix",
+                value = ".css,.js,.jpg,.png,.gif,.ico,.html,.htm,.txt,.xml,.json,.md,.svg,.woff,.woff2,.ttf,.eot,.otf"
+        )}
+)
 public class WmFilter implements Filter {
     private String[] excludeUrls;
     private String[] excludeSuffix;
@@ -34,7 +34,7 @@ public class WmFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        httpResponse.setContentType("text/html;charset=UTF-8");
+
 
         String contextPath = httpRequest.getContextPath();
 
@@ -52,6 +52,7 @@ public class WmFilter implements Filter {
 
         // 检查用户是否已登录
         if (httpRequest.getSession().getAttribute("user") == null) {
+            httpResponse.setContentType("text/html;charset=UTF-8");
             PrintWriter out = httpResponse.getWriter();
             out.print("<script>alert('登录状态失效，请先登录。');window.location.href='"+contextPath+LOGIN_PAGE+"';</script>");
         } else {

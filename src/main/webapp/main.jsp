@@ -5,24 +5,17 @@
 <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
     <title>外卖后台管理系统</title>
-    <link
-            href="${pageContext.request.contextPath}/easyui/themes/default/easyui.css"
-            rel="stylesheet" type="text/css"/>
+    <link href="${pageContext.request.contextPath}/easyui/themes/default/easyui.css" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/easyui/themes/icon.css">
-    <link href="${pageContext.request.contextPath}/css/my.css"
-          rel="stylesheet" type="text/css"/>
-    <link href="${pageContext.request.contextPath}/css/icon.css"
-          rel="stylesheet" type="text/css"/>
+    <link href="${pageContext.request.contextPath}/css/my.css" rel="stylesheet" type="text/css"/>
+    <link href="${pageContext.request.contextPath}/css/icon.css" rel="stylesheet" type="text/css"/>
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/texteditor.css"/>
     <script>
         let contextPath = "${pageContext.request.contextPath}/admin/";
     </script>
     <script src="${pageContext.request.contextPath}/easyui/jquery.min.js"></script>
-    <script
-            src="${pageContext.request.contextPath}/easyui/jquery.easyui.min.js"></script>
-    <script
-            src="${pageContext.request.contextPath}/easyui/locale/easyui-lang-zh_CN.js"
-            charset="utf-8"></script>
+    <script src="${pageContext.request.contextPath}/easyui/jquery.easyui.min.js"></script>
+    <script src="${pageContext.request.contextPath}/easyui/locale/easyui-lang-zh_CN.js" charset="utf-8"></script>
     <script src="${pageContext.request.contextPath}/js/jquery.form.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/echarts.min.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.texteditor.js"></script>
@@ -40,12 +33,10 @@
     </div>
     <div class="my-header-right">
         <p>
-            欢迎 ${system_admin_login_info.username} <a href="javascript:void(0)"
-                                                      onclick="editpassword();">修改密码</a> | <a href="javascript:void(0)"
-                                                                                              onclick="closeAll()">
-            清除缓存 </a> | <a
-                href="javascript:void(0)" onclick="doLogout()">
-            安全退出 </a>
+            欢迎 ${system_admin_login_info.username}
+            <a href="javascript:void(0)" onclick="editpassword();">修改密码</a> |
+            <a href="javascript:void(0)" onclick="closeAll()">清除缓存</a> |
+            <a href="javascript:void(0)" onclick="doLogout()">安全退出</a>
         </p>
         <p>
             <a id="nowTime"> </a>
@@ -67,9 +58,7 @@
 <div class="my-main" data-options="region:'center'">
     <div class="easyui-tabs" data-options="border:false,fit:true"
          id="my-tabs">
-        <div
-                data-options="href:'${pageContext.request.contextPath}/info.jsp',closable:false,iconCls:'icon-tip',cls:'pd3'"
-                title="欢迎使用"></div>
+        <div data-options="href:'${pageContext.request.contextPath}/info.jsp',closable:false,iconCls:'icon-tip',cls:'pd3'" title="欢迎使用"></div>
     </div>
 </div>
 <!-- end of main -->

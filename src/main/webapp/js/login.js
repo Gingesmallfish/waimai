@@ -1,10 +1,10 @@
-var verify = "user/verify";
+var verify = "user_/verify";
 var bclose = false;
 $(function() {
 	$('#login').panel({
 		title : '外卖后台管理系统',
 		width : 600,
-		height : 340,
+		height : 360,
 		iconCls : 'icon-bricks',
 		collapsible : true,
 		closable : true,
@@ -104,7 +104,7 @@ function doLogin() {
 		return;
 	}
 	$("#loginForm").ajaxSubmit({
-		url : "user/login",
+		url : "user_/login",
 		type : "post",
 		dataType : "json",
 		beforeSubmit : function(arr, $form, options) {},
@@ -116,11 +116,11 @@ function doLogin() {
 				if (result.code == 0) {
 					window.location.href = "../main.jsp";
 				} else {
-					// 验证码刷新
+					//刷新验证码
 					$('#verify-img').attr('src', verify + '?time=' + Math.random());
-					// 清空我们验证码文本框
+					//清空验证码文本框
 					$('input[textboxname=verify]').textbox('setValue', '');
-					// 验证码文本框聚焦
+					//验证码文本框聚焦
 					$('input[textboxname=verify]').textbox().next('span').find('input').focus();
 				}
 			});

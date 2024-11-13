@@ -25,7 +25,7 @@ import java.sql.SQLException;
  *
  **/
 @WebServlet(
-        value = "/user/*",
+        value = "/user_/*",
         initParams = {@WebInitParam(name = "captchaType",value = "GifCaptcha")},
         loadOnStartup = 1)
 public class UserController extends BaseController{
@@ -82,21 +82,21 @@ public class UserController extends BaseController{
         // 获取用户登录的信息
         String username = req.getParameter("username") == null ? "" : req.getParameter("username");
         String password = req.getParameter("password") == null ? "" : req.getParameter("password");
-        String verify = req.getParameter("verify") == null ? "" : req.getParameter("verify");
+        String verifyCode = req.getParameter("verify") == null ? "" : req.getParameter("verify");
         // 验证登录信息是否完整
         ObjectMapper objectMapper = new ObjectMapper();
         PrintWriter out = resp.getWriter();
-        if (username.equals("") || password.equals("") || verify.equals("")) {
+        if (username.equals("") || password.equals("") || verifyCode.equals("")) {
             out.print(objectMapper.writeValueAsString(new Result(Result.FAIL,"登录信息为填写完整")));
         } else {
             // 先判断验证码是否正确
-            if (req.getSession().getAttribute("verifyCode").toString().equalsIgnoreCase(verify)) {
+            if (req.getSession().getAttribute("verifyCode").toString().equalsIgnoreCase(verifyCode)) {
                 // 验证码用户名于密码是否正确
                 try {
                     Result result = employeeService.login(username, password);
                     if (result.code == Result.SUCCESS) {
                         // 将用户数据存在session中 以此记录用户中登录状态
-                        req.getSession().setAttribute("user",(Employee)result.data);
+                        req.getSession().setAttribute("user",(Employee)result.rows);
                     }
                     out.print(objectMapper.writeValueAsString(result));
                 } catch (SQLException e) {

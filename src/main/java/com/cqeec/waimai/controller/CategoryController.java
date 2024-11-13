@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(value = "/category/*")
+@WebServlet(value = "/category_/*")
 public class CategoryController extends BaseController {
 
     @Override
