@@ -1,0 +1,46 @@
+{
+  "data": [
+    {
+      "attributes": {
+        "url": ""
+      },
+      "pid": 0,
+      "id": 1,
+      "state": "closed",
+      "text": "外卖管理系统",
+      "iconCls": "icon-bricks"
+    },
+    {
+      "attributes": {
+        "url": "employee/employee.jsp"
+      },
+      "pid": 1,
+      "id": 2,
+      "state": "open",
+      "text": "员工管理",
+      "iconCls": "icon-user"
+    },
+    {
+      "attributes": {
+        "url": "category/category.jsp"
+      },
+      "pid": 1,
+      "id": 3,
+      "state": "open",
+      "text": "分类管理",
+      "iconCls": "icon-sum"
+    },
+    {
+      "attributes": {
+        "url": "dish/dish.jsp"
+      },
+      "pid": 1,
+      "id": 4,
+      "state": "open",
+      "text": "菜品管理",
+      "iconCls": "icon-filter"
+    }
+  ],
+  "message": "操作成功",
+  "status": true
+}

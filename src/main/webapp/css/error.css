@@ -1,0 +1,55 @@
+@charset "utf-8";
+body,
+div,
+h4,
+p {
+    margin: 0;
+    padding: 0
+}
+
+.errors {
+    width: 760px;
+    height: 550px;
+    background: url(../images/error.png) no-repeat;
+    margin: 25px auto;
+}
+
+.errors .code {
+    float: left;
+    margin-left: 50px;
+}
+
+.errors .code span {
+    font-size: 142px;
+    font-weight: bold;
+    font-family: "Helvetica";
+    color: #ff7575;
+    letter-spacing: 23px;
+}
+
+.errors .text {
+    width: 360px;
+    padding: 14px 0 0 406px
+}
+
+.errors .text h4 {
+    color: #e54919;
+    font: 36px "微软雅黑", "宋体";
+    font-weight: 700;
+    padding-bottom: 8px
+}
+
+.errors .text p {
+    line-height: 22px
+}
+
+.errors .text p span {
+    color: #e54919;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0 5px
+}
+
+.errors .text p #downTime {
+    cursor: default
+}
