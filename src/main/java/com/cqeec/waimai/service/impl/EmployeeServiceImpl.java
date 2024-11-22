@@ -24,6 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
 
+
     @Override
     public boolean delete(long id) throws SQLException {
         return false;
@@ -80,13 +81,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public boolean disable(long id,long userId) throws SQLException, CastResultException {
         int status = 0;
-        return employeeDao.updateStatus(id,status,userId);
+        return employeeDao.disable(id,status,userId);
     }
 
     @Override
     public boolean enable(long id,long userId) throws SQLException, CastResultException {
         int status = 1;
-        return employeeDao.updateStatus(id,status,userId);
+        return employeeDao.disable(id,status,userId);
     }
 
     /**

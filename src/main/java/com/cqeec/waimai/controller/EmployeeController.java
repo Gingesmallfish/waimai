@@ -16,7 +16,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -27,7 +26,7 @@ import java.util.Map;
 @WebServlet(value = "/employee_/*")
 public class EmployeeController extends BaseController {
 
-    EmployeeService employeeService;
+    public EmployeeService employeeService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -62,14 +61,16 @@ public class EmployeeController extends BaseController {
     /**
      * 这个方法是处理新增于修改操作
      *
-     * @param req
-     * @param resp
-     * @throws ServletException
-     * @throws IOException
+     * @param req 请求对象
+     * @param resp 响应对象
+     * @throws ServletException  异常
+     * @throws IOException 异常
      */
     private void save(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter out = resp.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
+
+        // 获取请求参数
         String id = req.getParameter("id");
         String name = req.getParameter("name");
         String sex = req.getParameter("sex");
@@ -127,6 +128,7 @@ public class EmployeeController extends BaseController {
                 out.print(objectMapper.writeValueAsString(new Result(Result.FAIL, "员工身份证号或手机号错误")));
             }
         }
+
     }
 
 
@@ -190,38 +192,56 @@ public class EmployeeController extends BaseController {
 
 
     private void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 创建查询条件MAp
         Map<String, Object> where = new HashMap<>();
+        // 获取请求参数
         String name = req.getParameter("employeeName");
         String status = req.getParameter("employeeStatus");
+        // 判断员工姓名不为空，则添加到查询条件中
         if (StrUtil.hasBlank(name)) {
             where.put("name", name);
         }
+        // 如果员工状态不为空不等于 -1，则添加假查询条件中
         if ((!StrUtil.hasBlank(status)) && (!status.equals("-1"))) {
             where.put("status", status);
         }
+        // 设置分页参数
         int currentPage = 1;  // 当前也页页码
-        int recordsPerPge = 5;
+        int recordsPerPge = 5; // 每页显示记录数
+
+        // 如果请求中包含page参数，则更新当前页吗
         if (!StrUtil.hasBlank(req.getParameter("page"))) {
             try {
                 currentPage = Integer.parseInt(req.getParameter("page"));
             } catch (Exception e) {
+                // 忽略异常，使用默认页码
             }
         }
+
+        // 如果请求中包含"rows"参数，则更新每页显示的记录数
         if (!StrUtil.hasBlank(req.getParameter("rows"))) {
             try {
                 recordsPerPge = Integer.parseInt(req.getParameter("rows"));
             } catch (Exception e) {
+                // 忽略异常，使用默认记录数
             }
         }
         try {
+            // 获取符合条件的总记录数
             int total = employeeService.getTotal(where);
+            // 获取当前页的员工列表
             ArrayList<Employee> employees = employeeService.list(where, currentPage, recordsPerPge);
+            // 1）获取响应的PrintWriter对象
             PrintWriter out = resp.getWriter();
+            // 2）创建ObjectMapper对象用于将结果转为JSON格式
             ObjectMapper objectMapper = new ObjectMapper();
+
+            // 输出结果
             out.print(objectMapper.writeValueAsString(
                     new Result(Result.SUCCESS, "操作成功", total, employees)
             ));
         } catch (SQLException | CastResultException e) {
+            // 处理异常
             handleException(req, resp, e);
         }
     }

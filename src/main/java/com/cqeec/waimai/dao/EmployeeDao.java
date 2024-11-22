@@ -17,7 +17,7 @@ public interface EmployeeDao {
     int getTotal(Map<String,Object> where) throws SQLException;
 
     boolean delete(long id) throws SQLException;
-    boolean updateStatus(long id, int status, long userId) throws SQLException;
+    boolean disable(long id, int status,long userId) throws SQLException;
 
     boolean insert(Employee employee) throws SQLException;
     boolean update(Employee employee) throws SQLException;
