@@ -58,13 +58,15 @@ public class EmployeeController extends BaseController {
         }
     }
 
+
     /**
-     * 这个方法是处理新增于修改操作
+     * 处理员工信息保存请求的方法
+     * 该方法负责解析HTTP请求中的员工信息，验证信息的完整性与合法性，并调用服务层方法保存员工信息
      *
-     * @param req 请求对象
-     * @param resp 响应对象
-     * @throws ServletException  异常
-     * @throws IOException 异常
+     * @param req 用于获取请求参数和会话信息的HttpServletRequest对象
+     * @param resp 用于向客户端输出响应内容的HttpServletResponse对象
+     * @throws ServletException 如果Servlet操作出错
+     * @throws IOException 如果输入输出操作出错
      */
     private void save(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 获取用于向客户端输出响应内容的PrintWriter对象
@@ -165,71 +167,103 @@ public class EmployeeController extends BaseController {
                 out.print(objectMapper.writeValueAsString(new Result(Result.FAIL, "员工身份证号或手机号错误")));
             }
         }
-
     }
 
 
+    /**
+     * 禁用员工账户
+     *
+     * 该方法从HTTP请求中提取员工ID参数，并尝试禁用该员工账户如果员工ID为空或无效，
+     * 则向响应中写入失败结果；否则，尝试禁用员工账户，并根据操作结果向响应中写入成功或失败信息
+     *
+     * @param req HTTP请求对象，用于获取请求参数和会话信息
+     * @param resp HTTP响应对象，用于向客户端写入响应数据
+     * @throws ServletException 如果Servlet操作失败
+     * @throws IOException 如果I/O操作失败
+     */
     private void disable(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // 禁用按钮
+        // 获取请求参数中的员工ID
+        String id = req.getParameter("id");
+        // 获取响应输出流，用于向客户端写入响应数据
         PrintWriter out = resp.getWriter();
-        String id = req.getParameter("id"); // 获取请求参数中的ID
-        ObjectMapper objectMapper = new ObjectMapper(); // 创建ObjectMapper对象，用于将结果转换为JSON格式
+        // 创建ObjectMapper实例，用于JSON序列化
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        try {
-            // 根据ID获取员工信息
-            Employee employee = employeeService.getEmployeeById(Long.parseLong(id));
-
-            // 将员工状态设置为禁用（0）
-            employee.setStatus(0);
-
-            // 保存更新后的员工信息
-            boolean r = employeeService.save(employee, employee.getId());
-
-            // 根据保存结果返回相应的结果
-            if (r) {
-                out.print(objectMapper.writeValueAsString(new Result(Result.SUCCESS, "禁用成功")));
-            } else {
-                out.print(objectMapper.writeValueAsString(new Result(Result.FAIL, "禁用失败")));
+        // 检查员工ID是否为空或仅包含空白字符
+        if (StrUtil.hasBlank(id)) {
+            // 如果员工ID无效，向响应中写入失败结果
+            out.print(objectMapper.writeValueAsString(new Result(Result.FAIL,"员工id不能为空")));
+        } else {
+            // 尝试禁用员工账户
+            try {
+                // 调用employeeService的disable方法禁用员工账户，并传递当前用户ID作为操作者标识
+                boolean r = employeeService.disable(Long.parseLong(id),((Employee)req.getSession().getAttribute("user")).getId());
+                if (r) {
+                    // 如果操作成功，向响应中写入成功结果
+                    out.print(objectMapper.writeValueAsString(new Result(Result.SUCCESS, "操作成功")));
+                } else {
+                    // 如果操作失败，向响应中写入失败结果
+                    out.print(objectMapper.writeValueAsString(new Result(Result.FAIL, "操作失败")));
+                }
+            } catch (SQLException | CastResultException e) {
+                // 处理可能的异常，包括数据库操作异常和类型转换异常
+                handleException(req,resp,e);
+                throw new RuntimeException(e);
             }
-        } catch (SQLException | CastResultException e) {
-            // 捕获并处理可能发生的异常
-            throw new RuntimeException(e);
         }
-
     }
 
+    /**
+     * 启用员工账户
+     *
+     * @param req 用于获取请求参数和会话信息
+     * @param resp 用于向客户端发送响应数据
+     * @throws ServletException 如果Servlet操作失败
+     * @throws IOException 如果输入/输出操作失败
+     */
     private void enable(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // 启用按钮
+        // 获取请求参数中的员工ID
+        String id = req.getParameter("id");
+        // 获取响应输出流，用于向客户端发送数据
         PrintWriter out = resp.getWriter();
-        String id = req.getParameter("id"); // 获取请求参数中的ID
-        ObjectMapper objectMapper = new ObjectMapper(); // 创建ObjectMapper对象，用于将结果转换为JSON格式
+        // 创建ObjectMapper实例，用于JSON序列化
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        try {
-            // 根据ID获取员工信息
-            Employee employee = employeeService.getEmployeeById(Long.parseLong(id));
-
-            // 将员工状态设置为启用（1）
-            employee.setStatus(1);
-
-            // 保存更新后的员工信息
-            boolean r = employeeService.save(employee, employee.getId());
-
-            // 根据保存结果返回相应的结果
-            if (r) {
-                out.print(objectMapper.writeValueAsString(new Result(Result.SUCCESS, "启用成功")));
-            } else {
-                out.print(objectMapper.writeValueAsString(new Result(Result.FAIL, "启用失败")));
+        // 检查员工ID是否为空或全空白
+        if (StrUtil.hasBlank(id)) {
+            // 如果员工ID为空或全空白，则返回失败结果
+            out.print(objectMapper.writeValueAsString(new Result(Result.FAIL,"员工id不能为空")));
+        } else {
+            try {
+                // 调用业务服务启用员工账户，并传递当前操作用户ID
+                boolean r = employeeService.enable(Long.parseLong(id), ((Employee)req.getSession().getAttribute("user")).getId());
+                if (r) {
+                    // 如果操作成功，则返回成功结果
+                    out.print(objectMapper.writeValueAsString(new Result(Result.SUCCESS, "操作成功")));
+                } else {
+                    // 如果操作失败，则返回失败结果
+                    out.print(objectMapper.writeValueAsString(new Result(Result.SUCCESS, "操作失败")));
+                }
+            } catch (SQLException | CastResultException e) {
+                // 处理SQL异常或类型转换异常
+                handleException(req,resp,e);
+                throw new RuntimeException(e);
             }
-        } catch (SQLException | CastResultException e) {
-            // 捕获并处理可能发生的异常
-            throw new RuntimeException(e);
         }
-
     }
 
 
+
+    /**
+     * 处理员工列表请求的方法
+     *
+     * @param req 用于获取请求参数和设置响应内容的HttpServletRequest对象
+     * @param resp 用于向客户端发送响应的HttpServletResponse对象
+     * @throws ServletException 如果Servlet遇到异常
+     * @throws IOException 如果发生输入或输出异常
+     */
     private void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // 创建查询条件MAp
+        // 创建查询条件Map
         Map<String, Object> where = new HashMap<>();
         // 获取请求参数
         String name = req.getParameter("employeeName");
@@ -246,7 +280,7 @@ public class EmployeeController extends BaseController {
         int currentPage = 1;  // 当前也页页码
         int recordsPerPge = 5; // 每页显示记录数
 
-        // 如果请求中包含page参数，则更新当前页吗
+        // 如果请求中包含page参数，则更新当前页码
         if (!StrUtil.hasBlank(req.getParameter("page"))) {
             try {
                 currentPage = Integer.parseInt(req.getParameter("page"));

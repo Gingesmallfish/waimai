@@ -83,7 +83,8 @@ public class DB {
     public static boolean execute(Connection connection, String sql) throws SQLException {
         Statement statement = null;
         statement = connection.createStatement();
-        return statement.execute(sql);
+        int i = statement.executeUpdate(sql);  // 受影响的行数
+        return i > 0 ? true : false;
     }
 
     public static boolean execute(Connection connection, String sql, Object... params) throws SQLException {
@@ -92,8 +93,8 @@ public class DB {
         for(int i = 0; i < params.length; ++i) {
             statement.setObject(i + 1, params[i]);
         }
-        statement.executeUpdate();
-        return true;
+        int j = statement.executeUpdate();  // 受影响的行数
+        return j > 0 ? true : false;
     }
 
     public static boolean execute(Connection connection, String sql, ArrayList<Object> values) throws SQLException {
@@ -104,8 +105,8 @@ public class DB {
         while(iterator.hasNext()){
             statement.setObject(i++, iterator.next());
         }
-        statement.executeUpdate();
-        return true;
+        int j = statement.executeUpdate();  // 受影响的行数
+        return j > 0 ? true : false;
     }
 
     /**

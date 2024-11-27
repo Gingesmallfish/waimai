@@ -56,15 +56,6 @@ public class EmployeeDaoImpl implements EmployeeDao {
         return employee;
     }
 
-    public boolean disable(long id, int status, long userId) throws SQLException {
-        return DB.execute(
-                DB.getConnection(),
-                "update employee set status = ?, update_user = ?, where id = ?",
-                id,
-                status,
-                userId
-        );
-    }
 
     /**
      *  分页查询

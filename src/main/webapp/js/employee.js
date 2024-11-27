@@ -1,8 +1,8 @@
 ﻿var employee_id = '';
-$(function() {
+$(function () {
     $('#employee-datagrid').datagrid({
         //请求数据url
-        url:"employee_/list",
+        url: "employee_/list",
         //是否显示一个行号列
         rownumbers: true,
         //在DataGrid控件底部是否显示分页工具栏
@@ -22,7 +22,7 @@ $(function() {
         //是否允许多列排序
         multiSort: true,
         //在从远程站点加载数据的时候显示提示消息
-        loadMsg : "数据加载中...",
+        loadMsg: "数据加载中...",
         columns: [[
             {
                 //列字段名称
@@ -59,7 +59,7 @@ $(function() {
                  * @param row : 行记录数据
                  * @param index : 行索引
                  */
-                formatter: function(value, row, index) {
+                formatter: function (value, row, index) {
                     if (value == "女") {
                         return '<span style="color:red;font-weight:bold;">' + value + '</span>';
                     } else {
@@ -84,7 +84,7 @@ $(function() {
                 title: '员工状态',
                 width: 30,
                 align: 'center',
-                formatter: function(value, row, index) {
+                formatter: function (value, row, index) {
                     if (value == 0) {
                         return '<span style="color:red;font-weight:bold;">禁用</span>';
                     } else {
@@ -103,18 +103,18 @@ $(function() {
         //在请求远程数据的时候发送额外的参数
         queryParams: {
             employeeName: "",
-            employeeStatus:-1
+            employeeStatus: -1
         },
         /**
          * 在用户双击一行的时候触发
          * @param index : 点击的行的索引值，该索引值从0开始。
          * @param row : 对应于点击行的记录。
          */
-        onDblClickRow: function(index, row) {
+        onDblClickRow: function (index, row) {
             editEmployee(row);
         },
         //在数据加载成功的时候触发
-        onLoadSuccess: function(data) {
+        onLoadSuccess: function (data) {
             if (!(data instanceof Object)) {
                 data = JSON.parse(data);
             }
@@ -148,16 +148,34 @@ function queryEmployee() {
     $('#employee-datagrid').datagrid('reload');
 }
 
+/**
+ * 根据员工状态显示启用或禁用按钮
+ * 
+ * @param {string} value - 初始状态值，未使用
+ * @param {object} row - 当前行数据对象，包含员工信息
+ * @param {number} index - 当前行索引
+ * @returns {string} 返回包含编辑和启用/禁用按钮的HTML字符串
+ */
 function showEmployeeOptBtn(value, row, index) {
+    // 根据员工状态设置显示的文本，0表示禁用，其他情况表示启用
     value = row["status"] == 0 ? "启用" : "禁用";
+    
+    // 返回编辑和启用/禁用按钮的HTML字符串
+    // 使用行索引作为参数，以便在点击按钮时能够操作对应行的数据
     return "<a href='#' onclick='employeeEditClick(" + index + ")' class='easyui-linkbutton' " +
         "id='editEmployee' name='editEmployee'>编辑</a>&nbsp;&nbsp;" +
         "<a href='#' onclick='enableOrDisable(" + index + ")' class='easyui-linkbutton' " +
-        "id='enableOrDisable' name='enableOrDisable'>" + value +"</a>";
+        "id='enableOrDisable' name='enableOrDisable'>" + value + "</a>";
 }
 
-function enableOrDisable(index){
+/**
+ * 
+ * @param {*} index 表格中的行缩 
+ */
+function enableOrDisable(index) {
+    // 获取用户点击的数据行的数据
     row = $('#employee-datagrid').datagrid('getData').rows[index];
+    // 根据员工状态设置求的Url
     reqUrl = row["status"] == 0 ? "employee_/enable" : "employee_/disable";
     $.messager.confirm('系统提示', '确认是否修改当前用户状态?', function (r) {
         if (r) {
@@ -165,7 +183,7 @@ function enableOrDisable(index){
                 url: reqUrl,
                 type: "post",
                 dataType: "json",
-                data: 'id=' + row["id"],
+                data: 'id=' + row["id"], // 员工id
                 success: function (result) {
                     if (!(result instanceof Object)) {
                         result = JSON.parse(result);
@@ -185,12 +203,12 @@ function enableOrDisable(index){
 
 function addEmployee(employeeid) {
     $('#emplopyee-form').form('clear');
-    $('#name').textbox('setValue','');
-    $('#sex').combobox('setValue','');
+    $('#name').textbox('setValue', '');
+    $('#sex').combobox('setValue', '');
     $('#username').textbox('setValue', '');
     $('#id_number').textbox('setValue', '');
     $('#phone').textbox('setValue', '');
-    $('#sex').combobox('setValue',"-1");
+    $('#sex').combobox('setValue', "-1");
     employee_id = employeeid;
     $('#employee-dialog').dialog({
         //设置初始状态为打开
@@ -198,9 +216,9 @@ function addEmployee(employeeid) {
         //用于控制对话框是否为模态窗口
         modal: true,
         //定义是否显示可折叠按钮
-        collapsible:true,
+        collapsible: true,
         //定义是否显示最小化按钮
-        minimizable:true,
+        minimizable: true,
         //对话框窗口标题文本
         title: "添加员工",
         /**
@@ -216,7 +234,7 @@ function addEmployee(employeeid) {
         }, {
             text: '关闭',
             iconCls: 'icon-bullet-cross',
-            handler: function() {
+            handler: function () {
                 $('#employee-dialog').dialog('close');
             }
         }]
@@ -228,15 +246,15 @@ function editEmployee(row) {
     if (row && row['id'] != undefined) {
         employee_id = row['id'];
         $('#name').textbox('setValue', row['name']);
-        $('#sex').combobox('setValue',row['sex']);
+        $('#sex').combobox('setValue', row['sex']);
         $('#username').textbox('setValue', row['username']);
         $('#id_number').textbox('setValue', row['id_number']);
         $('#phone').textbox('setValue', row['phone']);
         $('#employee-dialog').dialog({
             closed: false,
             modal: true,
-            collapsible:true,
-            minimizable:true,
+            collapsible: true,
+            minimizable: true,
             title: "编辑员工",
             buttons: [{
                 text: '保存',
@@ -245,7 +263,7 @@ function editEmployee(row) {
             }, {
                 text: '关闭',
                 iconCls: 'icon-bullet-cross',
-                handler: function() {
+                handler: function () {
                     $('#employee-dialog').dialog('close');
                 }
             }]
@@ -290,7 +308,7 @@ function saveEmployee() {
         $('#name').textbox().next('span').find('input').focus();
         return;
     }
-    if($('#sex').combobox('getValue') == "-1"){
+    if ($('#sex').combobox('getValue') == "-1") {
         $.messager.show({
             title: '系统提示',
             msg: "请选择员工性别"
@@ -313,7 +331,7 @@ function saveEmployee() {
         $('#id_number').textbox().next('span').find('input').focus();
         return;
     }
-    if(!validateIdNumber($('#id_number').textbox('getValue'))){
+    if (!validateIdNumber($('#id_number').textbox('getValue'))) {
         $.messager.show({
             title: '系统提示',
             msg: "身份证号错误"
@@ -329,7 +347,7 @@ function saveEmployee() {
         $('#phone').textbox().next('span').find('input').focus();
         return;
     }
-    if(!validatePhone($('#phone').textbox('getValue'))){
+    if (!validatePhone($('#phone').textbox('getValue'))) {
         $.messager.show({
             title: '系统提示',
             msg: "手机号错误"
@@ -341,7 +359,7 @@ function saveEmployee() {
         url: "employee_/save",
         type: "post",
         dataType: "json",
-        beforeSubmit: function(arr, $form, options) {
+        beforeSubmit: function (arr, $form, options) {
             arr.push({
                 'name': 'id',
                 'value': employee_id,
@@ -349,7 +367,7 @@ function saveEmployee() {
                 'required': false
             });
         },
-        success: function(result, status, xhr, $form) {
+        success: function (result, status, xhr, $form) {
             if (!(result instanceof Object)) {
                 result = JSON.parse(result);
             }
@@ -362,21 +380,23 @@ function saveEmployee() {
             if (result.code == 0) {
                 if (employee_id == '') {
                     $('#name').textbox('setValue', '');
-                    $('#sex').combobox('setValue','-1');
+                    $('#sex').combobox('setValue', '-1');
                     $('#username').textbox('setValue', '');
                     $('#id_number').textbox('setValue', '');
                     $('#phone').textbox('setValue', '');
                     $('#name').textbox().next('span').find('input').focus();
                     $('#employee-datagrid').datagrid('reload');
                 } else {
+                    // 重新加载表格数据
                     $('#employee-datagrid').datagrid('reload');
+                    // 关闭编辑对话框
                     $('#employee-dialog').dialog('close');
                 }
             }
         },
-        error: function(xhr, status, error, $form) {
+        error: function (xhr, status, error, $form) {
         },
-        complete: function(xhr, status, $form) {
+        complete: function (xhr, status, $form) {
         }
     });
 }
