@@ -58,13 +58,79 @@ public class CategoryController extends BaseController {
         }
     }
 
+    /**
+     * 处理删除分类请求
+     *
+     * @param req  HttpServletRequest对象，用于获取请求参数
+     * @param resp HttpServletResponse对象，用于输出响应内容
+     * @throws ServletException 如果发生Servlet异常
+     * @throws IOException      如果发生IO异常
+     */
     private void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        PrintWriter out = resp.getWriter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // 获取请求参数中的分类id
+            long id = Long.parseLong(req.getParameter("id"));
+            // 调用categoryService的delete方法来删除指定id的分类
+            boolean r = categoryService.delete(id);
+            // 如果删除成功，返回成功的Result对象，消息为“删除成功”
+            if (r) {
+                out.print(objectMapper.writeValueAsString(new Result(Result.SUCCESS, "删除成功")));
+            } else {
+                // 如果删除失败，返回失败的Result对象，消息为“删除失败”
+            }
+        } catch (SQLException e) {
+            // 处理SQL异常或类型转换异常
+            handleException(req, resp, e);
+            throw new RuntimeException(e);
+        }
     }
+
 
     private void save(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 获取用于向客户端输出响应内容的PrintWriter对象
+        PrintWriter out = resp.getWriter();
+        // 创建ObjectMapper对象，用于将Java对象转换为JSON格式以便在网络传输中使用
+        ObjectMapper objectMapper = new ObjectMapper();
 
+        // 获取请求参数，这些参数将用于新增或修改分类信息
+        String id = req.getParameter("id");
+        String name = req.getParameter("name");
+        String type = req.getParameter("type");
+        String sort = req.getParameter("sort"); // 获取排序参数
+
+        // 检查分类信息中的必填字段是否有空白值（为空或仅包含空格）
+        // 如果有任何一个必填字段为空，将返回错误信息给客户端
+        if (StrUtil.hasBlank(name)) {
+            out.print(objectMapper.writeValueAsString(new Result(Result.FAIL, "分类数据未填写完整")));
+            return;
+        }
+
+        try {
+            // 创建一个Category对象，用于存储即将新增或修改的分类信息
+            Category category = new Category();
+            category.setName(name);
+            category.setType(Long.parseLong(type));
+            category.setSort(Integer.parseInt(sort)); // 设置排序
+
+            if (StrUtil.hasBlank(id)) {
+                // 新增操作
+                category.setId(0);
+                boolean result = categoryService.save(category, category.getId());
+                out.print(objectMapper.writeValueAsString(new Result(result ? Result.SUCCESS : Result.FAIL, result ? "添加成功" : "添加失败")));
+            } else {
+                // 编辑
+                category.setId(Long.parseLong(id));
+                boolean result = categoryService.update(category, category.getId());
+                out.print(objectMapper.writeValueAsString(new Result(result ? Result.SUCCESS : Result.FAIL, result ? "修改成功" : "修改失败")));
+            }
+        } catch (SQLException | CastResultException e) {
+            handleException(req, resp, e);
+            throw new RuntimeException(e);
+        }
     }
+
 
     private void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 

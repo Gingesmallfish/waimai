@@ -30,6 +30,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         return false;
     }
 
+    /**
+     * 根据员工ID获取员工信息
+     *
+     * 此方法覆盖自接口或父类，目的是为了获取特定ID的员工对象
+     * 它依赖于employeeDao中的实现，通过数据库操作来获取员工信息
+     *
+     * @param id 员工的唯一标识符，用于数据库查询
+     * @return 返回一个Employee对象，包含查询到的员工信息
+     * @throws SQLException 如果数据库操作失败，抛出此异常
+     * @throws CastResultException 如果转换查询结果到Employee对象失败，抛出此异常
+     */
     @Override
     public Employee getEmployeeById(long id) throws SQLException, CastResultException {
         return employeeDao.getEmployeeById(id);
@@ -62,16 +73,38 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
+    /**
+     * 插入新的员工信息到数据库中
+     * 此方法首先将员工对象的创建时间和更新时间设置为当前时间，创建人和更新人设置为给定的用户ID，然后调用DAO层的方法进行数据库插入操作
+     *
+     * @param employee 待插入的员工对象，包含员工的相关信息
+     * @param userId 当前操作用户的ID，用于记录创建和更新操作的责任人
+     * @return 返回插入操作是否成功，true表示成功，false表示失败
+     * @throws SQLException 如果数据库操作过程中发生错误
+     * @throws CastResultException 如果在处理结果转换过程中发生错误
+     */
     public boolean insert(Employee employee,long userId) throws SQLException, CastResultException {
         // 将创建时间，创建人，跟新时间，跟新人存在到employee对象中
         employee.setCreate_user(userId);
         employee.setUpdate_user(userId);
         employee.setCreate_time(new Timestamp(System.currentTimeMillis()));
         employee.setUpdate_time(new Timestamp(System.currentTimeMillis()));
+        // 调用DAO层的方法，执行数据库插入操作
         return employeeDao.insert(employee);
     }
 
-    public boolean update(Employee employee,long userId) throws SQLException, CastResultException {
+    /**
+     * 更新员工信息
+     * 此方法用于更新数据库中的员工记录它不仅更新员工的基本信息，
+     * 还会更新最后修改人和最后修改时间
+     *
+     * @param employee 待更新的员工对象，包含需要更新的员工信息
+     * @param userId 当前操作用户的ID，用于记录最后修改人
+     * @return 返回更新操作是否成功
+     * @throws SQLException 如果与数据库的交互过程中发生SQL异常
+     * @throws CastResultException 如果在更新过程中抛出类型转换异常
+     */
+    public boolean update(Employee employee, long userId) throws SQLException, CastResultException {
         // 将创建时间，创建人，跟新时间，跟新人存在到employee对象中
         employee.setUpdate_user(userId);
         employee.setUpdate_time(new Timestamp(System.currentTimeMillis()));

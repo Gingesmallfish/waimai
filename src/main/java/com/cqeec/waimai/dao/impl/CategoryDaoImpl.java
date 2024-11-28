@@ -1,6 +1,5 @@
 package com.cqeec.waimai.dao.impl;
 
-
 import com.cqeec.waimai.bean.Category;
 import com.cqeec.waimai.dao.CategoryDoo;
 import com.cqeec.waimai.exception.CastResultException;
@@ -23,7 +22,7 @@ public class CategoryDaoImpl implements CategoryDoo {
 
     @Override
     public Category getCategoryByName(String name) throws SQLException, CastResultException {
-        return null;
+       return null;
     }
 
     /**
@@ -96,7 +95,11 @@ public class CategoryDaoImpl implements CategoryDoo {
 
     @Override
     public boolean delete(long id) throws SQLException {
-        return false;
+       return DB.execute(
+               DB.getConnection(),
+               "delete from category where id = ?",
+               id
+       );
     }
 
     /**
@@ -107,15 +110,33 @@ public class CategoryDaoImpl implements CategoryDoo {
      */
     @Override
     public boolean insert(Category category) throws SQLException {
+       // 创建sql语句
+        String sql = "insert into category(name,type,sort,create_user,create_time,update_user,update_time) values(?,?,?,?,?,?,?)";
         return DB.execute(
                 DB.getConnection(),
-                "INSERT INTO category(`name`,sort,type,create_time,create_user,update_time,update_user) VALUES(?,?,?,?,?,?,?)",
-                category.getName(),category.getSort(),category.getType(),category.getCreate_time(),category.getCreate_user(),category.getUpdate_time(),category.getUpdate_user()
+                sql,
+                category.getName(),
+                category.getType(),
+                category.getSort(),
+                category.getCreate_user(),
+                category.getCreate_time(),
+                category.getUpdate_user(),
+                category.getUpdate_time()
         );
     }
 
     @Override
     public boolean update(Category category) throws SQLException {
-        return false;
+       String sql = "update category set name = ?,type = ?,sort = ?,update_user = ?,update_time = ? where id = ?";
+       return DB.execute(
+               DB.getConnection(),
+               sql,
+               category.getName(),
+               category.getType(),
+               category.getSort(),
+               category.getUpdate_user(),
+               category.getUpdate_time(),
+               category.getId()
+       );
     }
 }

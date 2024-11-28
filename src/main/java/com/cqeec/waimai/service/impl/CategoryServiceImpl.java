@@ -46,32 +46,28 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryDoo.getTotal(where);
     }
 
+    /**
+     * 删除指定的类别数据对象
+     * <p>
+     * 此方法用于删除数据库中与给定ID关联的类别数据对象
+     * 它通过调用categoryDoo的delete方法来实现删除操作
+     *
+     * @param id 要删除的类别数据对象的ID
+     * @return 如果删除成功，则返回true；否则返回false
+     * @throws SQLException 如果数据库操作失败，则抛出SQLException
+     */
     @Override
     public boolean delete(long id) throws SQLException {
-        return false;
+        // 删除
+        return categoryDoo.delete(id);
     }
 
     @Override
     public Category getCategoryById(long id) throws SQLException, CastResultException {
-        return null;
+        return categoryDoo.getCategoryById(id);
     }
 
-    /**
-     * 保存分类信息
-     * @param category
-     * @param userId
-     * @return
-     * @throws SQLException
-     * @throws CastResultException
-     */
-    @Override
-    public boolean save(Category category, long userId) throws SQLException, CastResultException {
-       category.setCreate_user(userId);
-       category.setUpdate_user(userId);
-       category.setCreate_time(new Timestamp(System.currentTimeMillis()));
-       category.setUpdate_time(new Timestamp(System.currentTimeMillis()));
-       return categoryDoo.insert(category);
-    }
+
 
     /**
      * 根据给定的条件获取分类列表
@@ -89,4 +85,46 @@ public class CategoryServiceImpl implements CategoryService {
     public ArrayList<Category> list(Map<String, Object> where, int currentPage, int recordsPerPage) throws SQLException, CastResultException {
         return categoryDoo.list(where, currentPage, recordsPerPage);
     }
+
+    @Override
+    public boolean insert(Category category, long userId) throws SQLException {
+        category.setCreate_user(userId);
+        category.setUpdate_user(userId);
+        category.setCreate_time(new Timestamp(System.currentTimeMillis()));
+        category.setUpdate_time(new Timestamp(System.currentTimeMillis()));
+        return categoryDoo.insert(category);
+    }
+
+    @Override
+    public boolean update(Category category, long userId) throws SQLException {
+        category.setId(category.getId());
+        category.setName(category.getName());
+        category.setType(category.getType());
+        category.setSort(category.getSort());
+        category.setUpdate_user(userId);
+        category.setUpdate_time(new Timestamp(System.currentTimeMillis()));
+        return categoryDoo.update(category);
+    }
+
+
+    /**
+     * 保存分类信息和修改分类信息
+     *
+     * @param category
+     * @param userId
+     * @return
+     * @throws SQLException
+     * @throws CastResultException
+     */
+    @Override
+    public boolean save(Category category, long userId) throws SQLException, CastResultException {
+        // 判断
+        if (category.getId() == 0) {
+            return insert(category, userId);
+        } else {
+            return update(category, userId);
+        }
+    }
+
+
 }
