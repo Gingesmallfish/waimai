@@ -1,17 +1,33 @@
-var category_id = '';
+// 声明一个全局变量 category_id 用于存储当前选中的分类 ID
+let category_id = '';
+let sortDirection = 'asc'; // 初始排序方向为升序
+// 当文档加载完成后执行以下代码
 $(function () {
+    // 初始化分类数据表格
     $('#category-datagrid').datagrid({
-        url: "category_/listAll",  // 请求数据url
-        rownumbers: true,  // 是否显示一个行号列
-        pagination: true,  // 在DataGrid控件底部是否显示分页工具栏
-        fitColumns: true,  // 真正的自动展开/收缩列的大小，以适应网格的宽度，防止水平滚动。默认false
-        fit: true,  // 自适应大小,填充容器
-        pageSize: 10,  // 在设置分页属性的时候初始化页面大小（每页显示记录数量）
-        pageList: [5, 10, 20, 50],  // 在设置分页属性的时候初始化页面大小选择列表
-        remoteSort: true,  // 定义从服务器对数据进行排序
-        singleSelect: true,  // 设置只允许选择一行
-        multiSort: true,  // 是否允许多列排序
-        loadMsg: "数据加载中...",  // 在从远程站点加载数据的时候显示提示消息
+        // 数据请求 URL
+        url: "category_/listAll",
+        // 显示行号列
+        rownumbers: true,
+        // 显示分页工具栏
+        pagination: true,
+        // 自动调整列宽以适应表格宽度
+        fitColumns: true,
+        // 自适应大小，填充容器
+        fit: true,
+        // 每页显示的记录数
+        pageSize: 10,
+        // 分页大小选择列表
+        pageList: [5, 10, 20, 50],
+        // 从服务器对数据进行排序
+        remoteSort: true,
+        // 只允许选择一行
+        singleSelect: true,
+        // 允许多列排序
+        multiSort: true,
+        // 加载数据时的提示消息
+        loadMsg: "数据加载中...",
+        // 定义表格列
         columns: [[
             {
                 field: 'id',
@@ -31,6 +47,7 @@ $(function () {
                 title: '类型',
                 width: 100,
                 align: 'center',
+                // 格式化类型字段的值
                 formatter: function (value, row, index) {
                     if (value == 1) {
                         return '菜品分类';
@@ -46,37 +63,36 @@ $(function () {
                 title: '排序',
                 width: 50,
                 align: 'center',
-
             },
-
             {
                 field: 'operation',
                 title: '操作',
                 width: 100,
                 align: 'center',
+                // 格式化操作列，显示操作按钮
                 formatter: showCategoryOptBtn
             }
         ]],
+        // 查询参数
         queryParams: {
             categoryName: "",
             categoryType: -1,
         },
+        // 双击行时触发的事件
         onDblClickRow: function (index, row) {
             editCategory(row);
         },
+        // 数据加载成功后触发的事件
+        // 数据加载成功后触发的事件
         onLoadSuccess: function (data) {
             if (!(data instanceof Object)) {
                 data = JSON.parse(data);
             }
             if (data.code == 0) {
-                $("a[name='editCategory']").linkbutton({
-                    plain: true,
-                    iconCls: 'icon-edit'
-                });
-                $("a[name='enableOrDisable']").linkbutton({
-                    plain: true,
-                    iconCls: 'icon-lock'
-                });
+                // 初始化编辑按钮样式
+                initOperationButtons();
+
+                // 如果没有数据，显示提示信息
                 if (data.total == 0) {
                     $(this).datagrid('appendRow', {
                         name: '<div style="text-align:center;color:gray">暂无相关数据</div>'
@@ -87,12 +103,56 @@ $(function () {
                     });
                 }
             }
+        },
+        success: function (response) {
+            $('#category-datagrid').datagrid('loadData', response.data);
+        },
+        error: function (error) {
+            console.error('Error fetching data:', error);
         }
+    });
+    // 绑定排序按钮的点击事件
+    $('#sort').click(() => {
+        sortCategory();
     });
 });
 
 
+// 排序
+function sortCategory() {
+    // 获取数据网格中的数据
+    let data = $('#category-datagrid').datagrid('getData').rows;
 
+    // 切换排序方向
+    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+
+    // 根据排序方向对数据进行排序
+    if (sortDirection === 'asc') {
+        data.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+        data.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    // 更新数据网格的数据
+    $('#category-datagrid').datagrid('loadData', data);
+
+    initOperationButtons()
+}
+
+
+// 操作样式丢失的问题
+function initOperationButtons() {
+    // 初始化编辑按钮样式
+    $("a[name='editCategory']").linkbutton({
+        plain: true,
+        iconCls: 'icon-edit'
+    });
+    // 初始化启用/禁用按钮样式
+    $("a[name='enableOrDisable']").linkbutton({
+        plain: true,
+        iconCls: 'icon-cancel'
+    });
+}
 
 
 /**
@@ -102,7 +162,7 @@ $(function () {
  */
 function queryCategory() {
     // 获取数据网格的查询参数
-    var queryParams = $('#category-datagrid').datagrid('options').queryParams;
+    let queryParams = $('#category-datagrid').datagrid('options').queryParams;
     // 更新查询参数中的类别名称，使用文本框中的值，并去除前后空格
     queryParams.categoryName = $.trim($('#categoryName').textbox('getValue'));
     // 更新查询参数中的类别类型，使用下拉框中的值
@@ -259,17 +319,17 @@ function editCategory(row) {
  */
 function categoryEditClick(rowIndex) {
     // 获取当前选中的所有行
-    var rows = $('#category-datagrid').datagrid('getSelections');
+    let rows = $('#category-datagrid').datagrid('getSelections');
     // 如果选中的行数不是恰好一行，则不执行任何操作
     if (rows.length != 1) {
         return;
     }
     // 获取当前选中行的索引
-    var selectedRowIndex = $('#category-datagrid').datagrid('getRowIndex', $('#category-datagrid').datagrid('getSelected'));
+    let selectedRowIndex = $('#category-datagrid').datagrid('getRowIndex', $('#category-datagrid').datagrid('getSelected'));
     // 如果点击编辑的行索引与当前选中行的索引相等，则尝试编辑该行数据
     if (rowIndex == selectedRowIndex) {
         // 获取当前选中的行数据
-        var row = $('#category-datagrid').datagrid('getSelected');
+        let row = $('#category-datagrid').datagrid('getSelected');
         // 如果成功获取到行数据，则调用编辑函数
         if (row) {
             editCategory(row);
@@ -338,9 +398,11 @@ function saveCategory() {
                 } else {
                     // 如果是编辑分类，关闭对话框并重新加载分类数据网格
                     $('#category-datagrid').datagrid('reload');
-                    $('#category-dialog').dialog('close');
                 }
+                // 关闭弹出框
+                $('#category-dialog').dialog('close');
             }
+
         },
         // 处理服务器返回的错误响应
         error: function (xhr, status, error, $form) {

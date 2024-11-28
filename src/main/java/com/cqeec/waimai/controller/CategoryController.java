@@ -1,9 +1,7 @@
 package com.cqeec.waimai.controller;
 
-
 import cn.hutool.core.util.StrUtil;
 import com.cqeec.waimai.bean.Category;
-import com.cqeec.waimai.bean.Employee;
 import com.cqeec.waimai.exception.CastResultException;
 import com.cqeec.waimai.service.CategoryService;
 import com.cqeec.waimai.service.impl.CategoryServiceImpl;
@@ -28,6 +26,16 @@ public class CategoryController extends BaseController {
 
     public CategoryService categoryService;
 
+    /**
+     * 初始化Servlet时设置类别服务
+     *
+     * @param config Servlet的配置对象，用于初始化Servlet
+     * @throws ServletException 如果初始化过程中发生错误，抛出此异常
+     *
+     * 此方法在Servlet生命周期中被调用，用于初始化操作
+     * 它创建了一个CategoryServiceImpl实例并将其赋值给categoryService变量
+     * 这样做可能是为了在Servlet中使用categoryService提供的方法和服务
+     */
     @Override
     public void init(ServletConfig config) throws ServletException {
         categoryService = new CategoryServiceImpl();
@@ -88,6 +96,15 @@ public class CategoryController extends BaseController {
     }
 
 
+    /**
+     * 处理分类信息保存请求的方法
+     * 该方法负责解析HTTP请求中的参数，验证数据完整性，并调用服务层方法进行数据的新增或修改
+     *
+     * @param req 用于获取请求参数的HttpServletRequest对象
+     * @param resp 用于向客户端返回结果的HttpServletResponse对象
+     * @throws ServletException 如果Servlet操作失败
+     * @throws IOException 如果输入输出操作失败
+     */
     private void save(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 获取用于向客户端输出响应内容的PrintWriter对象
         PrintWriter out = resp.getWriter();
@@ -120,12 +137,13 @@ public class CategoryController extends BaseController {
                 boolean result = categoryService.save(category, category.getId());
                 out.print(objectMapper.writeValueAsString(new Result(result ? Result.SUCCESS : Result.FAIL, result ? "添加成功" : "添加失败")));
             } else {
-                // 编辑
+                // 编辑操作
                 category.setId(Long.parseLong(id));
                 boolean result = categoryService.update(category, category.getId());
                 out.print(objectMapper.writeValueAsString(new Result(result ? Result.SUCCESS : Result.FAIL, result ? "修改成功" : "修改失败")));
             }
         } catch (SQLException | CastResultException e) {
+            // 异常处理，将请求转发到错误处理方法，并重新抛出运行时异常
             handleException(req, resp, e);
             throw new RuntimeException(e);
         }
@@ -137,15 +155,29 @@ public class CategoryController extends BaseController {
     }
 
 
+    /**
+     * 列出所有分类信息
+     *
+     * 此方法负责处理列出所有分类信息的请求它从HTTP请求中获取参数，
+     * 根据这些参数查询数据库，并将结果以JSON格式返回给客户端
+     *
+     * @param req HTTP请求对象，用于获取请求参数
+     * @param resp HTTP响应对象，用于向客户端发送响应
+     * @throws ServletException 如果Servlet操作失败
+     * @throws IOException 如果输入/输出操作失败
+     */
     private void listAll(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 1）获取响应的PrintWriter对象
         PrintWriter out = resp.getWriter();
         // 2）创建ObjectMapper对象用于将结果转为JSON格式
         ObjectMapper objectMapper = new ObjectMapper();
+        // 初始化查询条件Map
         Map<String, Object> where = new HashMap<>();
+
         // 获取请求参数
         String name = req.getParameter("categoryName");
         String type = req.getParameter("categoryType");
+
         // 判断员工姓名不为空，则添加到查询条件中
         if (StrUtil.hasBlank(name)) {
             where.put("name", name);
@@ -154,9 +186,11 @@ public class CategoryController extends BaseController {
         if ((!StrUtil.hasBlank(type)) && (!type.equals("-1"))) {
             where.put("type", type);
         }
+
         // 设置分页参数
         int currentPage = 1;
         int recordsPerPge = 10;
+
         // 如果请求中包含page参数，则更新当前页码
         if (!StrUtil.hasBlank(req.getParameter("page"))) {
             try {
@@ -166,6 +200,7 @@ public class CategoryController extends BaseController {
             }
         }
 
+        // 如果请求中包含rows参数，则更新每页记录数
         if (!StrUtil.hasBlank(req.getParameter("rows"))) {
             try {
                 recordsPerPge = Integer.parseInt(req.getParameter("rows"));
@@ -173,13 +208,14 @@ public class CategoryController extends BaseController {
                 // 忽略异常，使用默认记录数
             }
         }
+
         try {
             // 获取符合条件的总记录数
             int total = categoryService.getTotal(where);
             // 获取当前页的员工列表
             ArrayList<Category> categories = categoryService.list(where, currentPage, recordsPerPge);
 
-            // 输出结果
+            // 将查询结果以JSON格式输出
             out.print(objectMapper.writeValueAsString(
                     new Result(Result.SUCCESS, "查询成功", total, categories)
             ));

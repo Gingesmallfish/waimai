@@ -29,6 +29,9 @@
                             plain="true">刷新</a>
                         <a href="#" class="easyui-linkbutton" iconCls="icon-back" onclick="removeTab()"
                             plain="true">返回</a>
+                        <a href="#" class="easyui-linkbutton" iconCls="icon-back" onclick="sortCategory()" plain="true">排序</a>
+
+
                     </div>
                     <div class="my-toolbar-search">
                         <label for="categoryName">分类名称:</label>
@@ -79,7 +82,7 @@
                             <label for="sort">排序:</label>
                         </td>
                         <td>
-                            <input type="sort" name="sort" id="sort" class="easyui-numberbox"
+                            <input type="text" name="sort" id="sort" class="easyui-numberbox"
                                 data-options="min:0,prompt:'请输入排序值'" style="width: 280px; height: 35px;" />
                         </td>
                     </tr>
