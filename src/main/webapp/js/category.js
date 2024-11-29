@@ -48,15 +48,7 @@ $(function () {
                 width: 100,
                 align: 'center',
                 // 格式化类型字段的值
-                formatter: function (value, row, index) {
-                    if (value == 1) {
-                        return '菜品分类';
-                    } else if (value == 2) {
-                        return '套餐分类';
-                    } else {
-                        return '未知类型';
-                    }
-                }
+                formatter: categoryOpt
             },
             {
                 field: 'sort',
@@ -83,7 +75,6 @@ $(function () {
             editCategory(row);
         },
         // 数据加载成功后触发的事件
-        // 数据加载成功后触发的事件
         onLoadSuccess: function (data) {
             if (!(data instanceof Object)) {
                 data = JSON.parse(data);
@@ -104,6 +95,7 @@ $(function () {
                 }
             }
         },
+        // 数据加载失败触发事件
         success: function (response) {
             $('#category-datagrid').datagrid('loadData', response.data);
         },
@@ -117,8 +109,35 @@ $(function () {
     });
 });
 
+/**
+ * 根据类别类型生成类别名称
+ * @param value 初始值
+ * @param row 列
+ * @param index 行数的索引
+ * @returns {string} 未知类型
+ */
+function categoryOpt(value, row, index) {
+    // 根据value 判断返回对应的类别名称
+    if (value == 1) {
+        return '菜品分类';
+    } else if (value == 2) {
+        return '套餐分类';
+    } else {
+        // 如果value值既不是1也不是2，则返回未知类型
+        return '未知类型';
+    }
+}
 
-// 排序
+
+/**
+ * 对类别数据进行排序
+ *
+ * 此函数通过改变数据的排序来对数据进行排序首先获取数据网格中的所有数据
+ * 然后根据当前排序方向（升序或者降序）对数据进行排序完成后，更新数据网格可以反映新的排序结果
+ * 并重新初始化操作按钮意以适应新的数据排序
+ *
+ * @returns {void} 无返回值，但会更新数据网格和操作按钮
+ */
 function sortCategory() {
     // 获取数据网格中的数据
     let data = $('#category-datagrid').datagrid('getData').rows;
