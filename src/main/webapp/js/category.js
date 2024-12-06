@@ -95,12 +95,14 @@ $(function () {
                 }
             }
         },
+
+
         // 数据加载失败触发事件
         success: function (response) {
             $('#category-datagrid').datagrid('loadData', response.data);
         },
         error: function (error) {
-            console.error('Error fetching data:', error);
+            console.error('数据加载失败', error);
         }
     });
     // 绑定排序按钮的点击事件
@@ -118,9 +120,9 @@ $(function () {
  */
 function categoryOpt(value, row, index) {
     // 根据value 判断返回对应的类别名称
-    if (value == 1) {
+    if (value === 1) {
         return '菜品分类';
-    } else if (value == 2) {
+    } else if (value === 2) {
         return '套餐分类';
     } else {
         // 如果value值既不是1也不是2，则返回未知类型
@@ -152,31 +154,44 @@ function sortCategory() {
         data.sort((a, b) => b.name.localeCompare(a.name));
     }
 
-    // 更新数据网格的数据
-    $('#category-datagrid').datagrid('loadData', data);
-
-    initOperationButtons()
+    // 延迟执行，确保数据已更新
+    setTimeout(() => {
+        // 更新数据网格的数据
+        $('#category-datagrid').datagrid('loadData', data);
+        // 初始化操作按钮样式
+        initOperationButtons()
+        // 提示：排序成功
+        $.messager.show({
+            title: '系统提示', msg: '数据已排序', timeout: 500, showType: 'slide'
+        });
+    })
 }
 
 
-// 操作样式丢失的问题
+/**
+ * 初始化操作按钮的样式
+ *
+ * 本函数通过jQuery为特定名称的锚点元素（a）添加linkbutton样式和图标，以区分不同的操作按钮
+ * 主要目的是为了提升用户界面的直观性和美观性
+ */
 function initOperationButtons() {
     // 初始化编辑按钮样式
     $("a[name='editCategory']").linkbutton({
         plain: true,
         iconCls: 'icon-edit'
     });
-    // 初始化启用/禁用按钮样式
+    // 初始化启用/删除按钮样式
     $("a[name='enableOrDisable']").linkbutton({
         plain: true,
-        iconCls: 'icon-cancel'
+        iconCls: 'icon-delete'
     });
 }
 
 
+
 /**
  * 查询类别信息
- * 
+ *
  * 本函数从用户界面收集查询参数，包括类别名称和类别类型，并使用这些参数重新加载数据网格，以显示过滤后的数据
  */
 function queryCategory() {
@@ -194,7 +209,7 @@ function queryCategory() {
 /**
  * 生成类别管理页面的操作按钮
  * 该函数用于为每个类别项生成编辑和删除的按钮
- * 
+ *
  * @param {any} value - 不使用，占位参数，可能代表当前单元格的值
  * @param {object} row - 当前行的数据对象
  * @param {number} index - 当前行的索引
@@ -216,10 +231,10 @@ function showCategoryOptBtn(value, row, index) {
  */
 function enableOrDisable(index) {
     // 获取数据网格中指定索引的行数据
-    row = $('#category-datagrid').datagrid('getData').rows[index];
+    let row = $('#category-datagrid').datagrid('getData').rows[index];
     // 定义删除请求的URL
-    reqUrl = "category_/delete";
-    
+    let reqUrl = "category_/delete";
+
     // 显示确认对话框以确保用户想要删除分类
     $.messager.confirm('系统提示', '确认是否删除当前分类?', function (r) {
         // 如果用户确认删除，则发送异步请求

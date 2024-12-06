@@ -33,14 +33,14 @@
                             <option value="1">菜品分类</option>
                             <option value="2">套餐分类</option>
                         </select>
-                        <a href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="queryCategory()" style="height:35px;">查&nbsp;&nbsp;询&nbsp;&nbsp;</a>
+                        <a href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="queryCategory()"
+                            style="height:35px;">查&nbsp;&nbsp;询&nbsp;&nbsp;</a>
                     </div>
                 </div>
-                <table id="category-datagrid" toolbar="#category-toolbar"></table>
+                <table id="category-datagrid" class="category-datagrid" toolbar="#category-toolbar" style="cursor: pointer;"></table>
             </div>
         </div>
-        <div id="category-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-user'"
-            style="width: 440px; padding: 10px; display: flex; justify-content: center; text-align: center">
+        <div id="category-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-user'" style="width: 440px; padding: 10px; display: flex; justify-content: center; text-align: center">
             <form id="category-form" method="post">
                 <table class="category_table">
                     <tr>
@@ -48,7 +48,8 @@
                             <label for="name">分类名称:</label>
                         </td>
                         <td>
-                            <input type="text" name="name" id="name" class="easyui-textbox" data-options="prompt:'分类名称'" style="width: 280px; height: 35px;" />
+                            <input type="text" name="name" id="name" class="easyui-textbox" data-options="prompt:'分类名称'"
+                                style="width: 280px; height: 35px;" />
                         </td>
                     </tr>
                     <tr>
@@ -69,7 +70,8 @@
                             <label for="sort">排序:</label>
                         </td>
                         <td>
-                            <input type="text" name="sort" id="sort" class="easyui-numberbox" data-options="min:0,prompt:'请输入排序值'" style="width: 280px; height: 35px;" />
+                            <input type="text" name="sort" id="sort" class="easyui-numberbox"
+                                data-options="min:0,prompt:'请输入排序值'" style="width: 280px; height: 35px;" />
                         </td>
                     </tr>
                 </table>

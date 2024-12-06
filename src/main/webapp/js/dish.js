@@ -1,16 +1,20 @@
 ﻿var dish_id = '';
+var editor;
 $(function() {
     loadCategory();
-    $('#description').texteditor({
-        toolbar: ['bold', 'italic', 'strikethrough', 'underline', '-',
+    editor = KindEditor.create('#description', {
+        resizeType: 1,
+        items: ['bold', 'italic', 'strikethrough', 'underline', '-',
             'justifyleft', 'justifycenter', 'justifyright', 'justifyfull', '-',
             'insertorderedlist', 'insertunorderedlist', 'outdent', 'indent', '-',
-            'forecolor','backcolor','-',
-            'fontname', 'fontsize']
+            'forecolor', 'backcolor', '-',
+            'fontname', 'fontsize'],
+        height: true
     });
+
     $('#imageUpload').filebox({
         buttonText: '选择文件',
-        buttonAlign: 'right'
+        buttonAlign: 'right',
     })
     $('#dish-datagrid').datagrid({
         url:"dish_/list",
@@ -159,24 +163,37 @@ function createTooltip() {
     });
 }
 
+/**
+ * 当选择图片时触发的函数
+ * @param {Event} e - 触发的事件对象
+ */
 function onImageSelected(e) {
+    // 获取下一个元素中的文件输入框
     var f = $(this).next().find('input[type=file]')[0];
+    // 检查是否有文件被选中
     if(f.files && f.files[0]){
+        // 创建一个文件读取对象
         var reader = new FileReader();
+        // 定义读取文件后的操作
         reader.onload = function (e){
+            // 设置图片预览的src属性为读取到的文件内容
             $("#previewImage").attr("src",e.target.result);
+            // 显示图片预览
             $("#previewImage").css(
                 {"display":"block"}
             );
+            // 延时500毫秒后执行淡入效果
             setTimeout(function () {
                 $("#previewImage").css(
                     {"opacity":"1"}
                 );// 淡入效果
             }, 500);
         }
+        // 读取选中的文件为Data URL格式
         reader.readAsDataURL(f.files[0]);
     }
 }
+
 
 function queryDish() {
     var queryParams = $('#dish-datagrid').datagrid('options').queryParams;
@@ -195,22 +212,32 @@ function showDishOptBtn(value, row, index) {
         "id='deleteDish' name='deleteDish'>删除</a>";
 }
 
+/**
+ * 加载类别数据到下拉菜单中
+ * 此函数通过Ajax请求从服务器获取类别列表，并将其填充到具有ID为'category_id'的下拉菜单中
+ */
 function loadCategory(){
+    // 发起Ajax请求获取类别列表
     $.ajax({
         url: "category_/list",
         dataType: 'json',
         type: 'get',
         success: function(data) {
+            // 检查返回数据是否为对象，如果不是，则解析为JSON
             if (!(data instanceof Object)) {
                 data = JSON.parse(data);
             }
+            // 根据返回数据的状态码处理结果
             if (data.code == 0) {
+                // 如果状态码为0，表示成功，清除下拉菜单中现有的选项（保留默认选项）
                 $('#category_id option:gt(0)').remove();
+                // 遍历返回的类别列表，为每个类别创建一个新的选项，并添加到下拉菜单中
                 $.each(data.rows, function(index, value) {
                     $('#category_id').append('<option value=' + value.id + '>' + value.name + '</option>')
                 });
             }
             else {
+                // 如果状态码不为0，显示错误消息
                 $.messager.show({
                     title: '系统提示',
                     msg: data.message,
@@ -219,9 +246,11 @@ function loadCategory(){
                 });
             }
         },
+        // 设置请求为同步，这通常不推荐使用，因为它会阻塞浏览器，导致用户界面不响应
         async: false
     });
 }
+
 
 function deleteDish(index){
     row = $('#dish-datagrid').datagrid('getData').rows[index];
@@ -279,11 +308,9 @@ function enableOrDisableDish(index){
 function addDish(dishid) {
     $('#dish-form').form('clear');
     $("#previewImage").attr("src","#");
-    $("#previewImage").css(
-        {"display":"none"}
-    );
+    $("#previewImage").css({"display":"none"});
     $('#category_id').combobox('setValue',"-1");
-    dish_id = dishid;
+    dish_id = dishid;  // 赋值，而不是重新声明
     $('#dish-dialog').dialog({
         closed: false,
         modal: true,
@@ -291,19 +318,8 @@ function addDish(dishid) {
         minimizable:true,
         title: "添加菜品",
         onBeforeClose: function(event, ui) {
-            $('#description').texteditor('setValue', '');
+            editor.html('');
         },
-        toolbar:[{
-            text:'保存',
-            iconCls:'icon-save',
-            handler:saveDish
-        },{
-            text:'关闭',
-            iconCls:'icon-bullet-cross',
-            handler: function() {
-                $('#dish-dialog').dialog('close');
-            }
-        }],
         buttons: [{
             text: '保存',
             iconCls: 'icon-save',
@@ -319,15 +335,25 @@ function addDish(dishid) {
     $('input[textboxname=_dishname]').textbox().next('span').find('input').focus();
 }
 
+/**
+ * 编辑菜品信息
+ * @param {Object} row - 包含菜品信息的对象
+ * 该函数根据提供的菜品信息填充表单字段，并显示菜品的详细信息以供编辑
+ */
 function editDish(row) {
+    // 确保row对象存在且具有id属性
     if (row && row['id'] != undefined) {
+        // 提取菜品ID
         dish_id = row['id'];
+        // 设置菜品名称
         $('input[textboxname=_dishname]').textbox('setValue', row['name']);
+        // 设置菜品分类
         $('#category_id').combobox('setValue',row['category_id']);
+        // 设置价格
         $('input[textboxname=price]').textbox('setValue', row['price']);
+        // 设置菜品代码
         $('input[textboxname=code]').textbox('setValue', row['code']);
-        //图片显示
-        debugger;
+        // 根据是否有图片，设置图片显示或隐藏
         if(row['image'] == null){
             $("#previewImage").attr("src","#");
             $("#previewImage").css(
@@ -339,17 +365,22 @@ function editDish(row) {
                 {"display":"block"}
             );
         }
+        // 设置菜品描述
         $('#description').texteditor('setValue', row['description']);
+        // 设置菜品排序
         $('input[textboxname=dishSort]').textbox('setValue', row['sort']);
+        // 初始化菜品编辑对话框
         $('#dish-dialog').dialog({
             closed: false,
             modal: true,
             collapsible:true,
             minimizable:true,
             title: "编辑菜品",
+            // 在对话框关闭前清空描述字段
             onBeforeClose: function(event, ui) {
                 $('#description').texteditor('setValue', '');
             },
+            // 添加工具栏按钮
             toolbar:[{
                 text:'保存',
                 iconCls:'icon-save',
@@ -361,6 +392,7 @@ function editDish(row) {
                     $('#dish-dialog').dialog('close');
                 }
             }],
+            // 添加底部按钮
             buttons: [{
                 text: '保存',
                 iconCls: 'icon-save',
@@ -373,9 +405,11 @@ function editDish(row) {
                 }
             }]
         });
+        // 聚焦到菜品名称字段
         $('input[textboxname=_dishname]').textbox().next('span').find('input').focus();
     }
 }
+
 
 
 function dishEditClick(rowIndex) {

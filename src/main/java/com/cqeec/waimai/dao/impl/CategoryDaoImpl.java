@@ -20,11 +20,6 @@ public class CategoryDaoImpl implements CategoryDoo {
         return null;
     }
 
-    @Override
-    public Category getCategoryByName(String name) throws SQLException, CastResultException {
-       return null;
-    }
-
     /**
      * 根据条件查询分类列表
      *

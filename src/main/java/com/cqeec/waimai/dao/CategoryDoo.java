@@ -10,7 +10,6 @@ import java.util.Map;
 
 public interface CategoryDoo {
     Category getCategoryById(long id) throws SQLException, CastResultException;
-    Category getCategoryByName(String name) throws SQLException, CastResultException;
     ArrayList<Category> list(Map<String, Object> where, int page, int size) throws SQLException, CastResultException;
     int getTotal(Map<String, Object> where) throws SQLException;
 
