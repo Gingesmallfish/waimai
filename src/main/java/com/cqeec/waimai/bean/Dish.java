@@ -20,7 +20,7 @@ public class Dish {
   private long update_user;
   private long is_deleted;
 
-   private  Category category;
+   private  Category category;  // 关联字段（关联分类数据）
   public long getId() {
     return id;
   }

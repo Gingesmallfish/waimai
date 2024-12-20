@@ -13,13 +13,21 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Web过滤器: 建立在客户端与服务器之间，主要的功能是对请求作为预处理操作（可以拦截所有请求）
+ * 实现日志记录，权限控制等功能
+ * 多个过滤器执行的顺序： 按过滤器的名字排序先后执行
+ * 拦截器（SpringMvc）: 针对于特定请求的拦击
+ *
+ */
 @WebFilter(
-        urlPatterns = {"/*"},
+
+        urlPatterns = {"/*"}, // 拦截过滤器的规制
         initParams = {@WebInitParam(
-                name = "excludeUrl",
+                name = "excludeUrl", // 不拦截过滤器的请求
                 value = "/user_/login,/error.jsp,/login.jsp,/user_/verify,/autoLogin"
         ), @WebInitParam(
-                name = "excludeSuffix",
+                name = "excludeSuffix", // 排除静态资源文件（css, image, js等等）
                 value = ".css,.js,.jpg,.png,.gif,.ico,.html,.htm,.txt,.xml,.json,.md,.svg,.woff,.woff2,.ttf,.eot,.otf"
         )}
 )
@@ -36,8 +44,13 @@ public class WmFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String contextPath = httpRequest.getContextPath();
+        if (isAjaxRequest(httpRequest)) {
+            httpResponse.setContentType("text/html;charset=UTF-8");
+        }
+
         // 检查排除的URLs
         if (isExcludedUrl(contextPath, excludeUrls, httpRequest)) {
+            // 放行（把请求提交）
             chain.doFilter(httpRequest, httpResponse);
             return;
         }
@@ -50,6 +63,7 @@ public class WmFilter implements Filter {
         if (httpRequest.getSession().getAttribute("user") == null) {
             httpResponse.sendRedirect("/autoLogin?pageUrl="+ httpRequest.getRequestURI());
         } else {
+            // 判断当前请求用户的权限
             chain.doFilter(httpRequest, httpResponse);
         }
     }

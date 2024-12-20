@@ -46,29 +46,45 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeDao.getEmployeeById(id);
     }
 
+    /**
+     * 更新员工密码
+     *
+     * 该方法负责调用员工数据访问对象中的更新方法，以修改数据库中员工的密码信息
+     *
+     * @param employee 员工对象，包含需要更新的密码信息
+     * @return 返回更新操作是否成功如果返回true，则表示密码更新成功；如果返回false，则表示更新失败
+     * @throws SQLException 如果数据库操作失败，抛出此异常
+     */
     @Override
     public boolean updatePassword(Employee employee) throws SQLException {
         return employeeDao.update(employee);
     }
 
     /**
+     * 保存员工信息
      *
-     * @param employee
-     * @param userId 操作者编号
-     * @return
-     * @throws SQLException
-     * @throws CastResultException
+     * 此方法旨在处理员工信息的保存操作，包括插入新员工信息和更新现有员工信息
+     * 它首先检查员工的登录账号是否有效，如果无效则根据员工ID判断是插入还是更新操作
+     *
+     * @param employee 待保存的员工对象，包含员工的详细信息
+     * @param userId 操作者编号，用于记录操作日志
+     * @return 返回保存操作是否成功如果员工登录账号已存在，则返回false
+     * @throws SQLException 当数据库操作失败时抛出此异常
+     * @throws CastResultException 当数据类型转换失败时抛出此异常
      */
     @Override
     public boolean save(Employee employee,long userId) throws SQLException, CastResultException {
         // 验证员工登录账号是否有效-
         if (employeeDao.getEmployeeByUserName(employee.getId(),employee.getUsername()) == null) {
             if (employee.getId() == 0) {
+                // 插入新员工信息
                 return insert(employee,userId);
             } else {
+                // 更新现有员工信息
                 return update(employee,userId);
             }
         } else {
+            // 员工登录账号已存在，保存失败
             return false;
         }
     }

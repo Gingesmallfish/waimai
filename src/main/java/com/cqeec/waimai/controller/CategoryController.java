@@ -87,6 +87,7 @@ public class CategoryController extends BaseController {
                 out.print(objectMapper.writeValueAsString(new Result(Result.SUCCESS, "删除成功")));
             } else {
                 // 如果删除失败，返回失败的Result对象，消息为“删除失败”
+                out.print(objectMapper.writeValueAsString(new Result(Result.FAIL, "删除失败")));
             }
         } catch (SQLException e) {
             // 处理SQL异常或类型转换异常
@@ -150,10 +151,6 @@ public class CategoryController extends BaseController {
     }
 
 
-    private void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-    }
-
 
     /**
      * 列出所有分类信息
@@ -166,7 +163,7 @@ public class CategoryController extends BaseController {
      * @throws ServletException 如果Servlet操作失败
      * @throws IOException 如果输入/输出操作失败
      */
-    private void listAll(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 1）获取响应的PrintWriter对象
         PrintWriter out = resp.getWriter();
         // 2）创建ObjectMapper对象用于将结果转为JSON格式
@@ -222,6 +219,42 @@ public class CategoryController extends BaseController {
         } catch (SQLException | CastResultException e) {
             // 处理异常
             handleException(req, resp, e);
+        }
+    }
+
+
+    /**
+     * 列出所有类别信息
+     *
+     * 该方法用于获取数据库中所有的类别信息，并将其以JSON格式返回给客户端
+     * 它首先设置响应内容类型为文本/html，然后获取响应输出流
+     * 使用ObjectMapper对象来帮助将类别信息转换为JSON格式字符串
+     * 在处理过程中，如果遇到SQL异常或类型转换异常，将调用错误处理方法
+     *
+     * @param req 用于获取请求信息的HttpServletRequest对象
+     * @param resp 用于向客户端发送响应的HttpServletResponse对象
+     * @throws ServletException 如果Servlet运行出错
+     * @throws IOException 如果在处理输入输出时发生错误
+     */
+    private void listAll(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 获取响应输出流，用于向客户端发送数据
+        PrintWriter out = resp.getWriter();
+        // 创建ObjectMapper对象，用于JSON序列化和反序列化
+        ObjectMapper objectMapper = new ObjectMapper();
+        // 创建一个空的条件映射，用于查询所有记录
+        Map<String, Object> where = new HashMap<>();
+        try {
+            // 获取类别总数
+            long total = categoryService.getTotal(where);
+            System.out.println(total);
+            // 获取所有类别信息
+            ArrayList<Category> categories = categoryService.listAll(where);
+            // 将查询结果以JSON格式返回给客户端
+            out.print(objectMapper.writeValueAsString(new Result(Result.SUCCESS, "查询成功", categories)));
+        } catch (SQLException | CastResultException e) {
+            // 异常处理：调用处理异常的方法
+            handleException(req, resp, e);
+            throw new RuntimeException(e);
         }
     }
 }

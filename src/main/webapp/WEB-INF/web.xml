@@ -6,4 +6,5 @@
     <session-config>
         <session-timeout>5</session-timeout>
     </session-config>
+    <!-- 配置文件中就按配置的的先后顺序先后执行   -->
 </web-app>

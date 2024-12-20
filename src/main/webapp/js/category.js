@@ -6,7 +6,7 @@ $(function () {
     // 初始化分类数据表格
     $('#category-datagrid').datagrid({
         // 数据请求 URL
-        url: "category_/listAll",
+        url: "category_/list",
         // 显示行号列
         rownumbers: true,
         // 显示分页工具栏

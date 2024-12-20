@@ -17,7 +17,7 @@ $(function() {
 			}
 		} ],
 		onOpen : function() {
-			$('#username').textbox().next('span').find('input').focus();
+			$('#username').textbox().next('span').find('input').focus(); 
 		},
 		onExpand : function() {
 			$('#username').textbox().next('span').find('input').focus();

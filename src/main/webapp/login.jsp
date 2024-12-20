@@ -38,8 +38,7 @@ tr td {
 <script src="${pageContext.request.contextPath}/js/login.js"></script>
 </head>
 <body>
-	<div id="panel_login"
-		style="margin: auto;width: 600px;margin-top: 180px;">
+	<div id="panel_login" style="margin: auto;width: 600px;margin-top: 180px;">
 		<!--创建登录面板-->
 		<div id="login">
 			<form id="loginForm">
@@ -82,7 +81,9 @@ tr td {
 				<input value="login" type="hidden" name="method">
 			</form>
 		</div>
-		<div id="footer" style="padding:5px;text-align:center;font-size:10px;color:gray;">CopyRight © 2023 - 2027 CQEEC GROUP CO., LTD All Rights Reserved.</div>
+		<div id="footer" style="padding:5px;text-align:center;font-size:10px;color:gray;">
+			CopyRight © 2023 - 2027 CQEEC GROUP CO., LTD All Rights Reserved.
+		</div>
 	</div>
 </body>
 </html>

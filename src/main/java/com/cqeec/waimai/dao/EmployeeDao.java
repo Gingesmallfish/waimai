@@ -9,7 +9,6 @@ import java.util.Map;
 
 public interface EmployeeDao {
 
-
     Employee getEmployeeById(long id) throws SQLException, CastResultException;
     Employee getEmployeeByUserName(long id,String username) throws SQLException, CastResultException;
     Employee login(String username) throws SQLException, CastResultException;

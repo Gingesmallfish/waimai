@@ -18,7 +18,6 @@ public interface EmployeeService {
     boolean save(Employee employee,long userId) throws SQLException, CastResultException;
 
     boolean disable(long id,long userId) throws SQLException, CastResultException;
-
     boolean enable(long id,long userId) throws SQLException, CastResultException;
 
     Result login(String username, String password) throws SQLException, CastResultException;
